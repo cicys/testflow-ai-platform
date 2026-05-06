@@ -1,0 +1,4 @@
+{
+  "command": ["python3", "-c", "print('ok from Oversee smoke check')"],
+  "timeout_seconds": 60
+}

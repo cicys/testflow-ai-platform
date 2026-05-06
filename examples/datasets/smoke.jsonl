@@ -1,0 +1,2 @@
+{"sample_id":"sample-001","input":{"text":"hello"},"reference":{"label":"ok"},"meta":{"source":"smoke"}}
+{"sample_id":"sample-002","input":{"text":"world"},"reference":{"label":"ok"},"meta":{"source":"smoke"}}
