@@ -117,10 +117,10 @@ python3 scripts/run_testflow.py --executor mock
 - [Skill Toolkit](docs/skill-toolkit.md)
 - [路线图](docs/roadmap.md)
 - [公开发布检查清单](docs/release-checklist.md)
-- [产品概览（脱敏摘要）](docs/overview-product-zh.md)
-- [可行性摘要（脱敏）](docs/feasibility-summary-zh.md)
+- [产品概览](docs/overview-product-zh.md)
+- [可行性摘要](docs/feasibility-summary-zh.md)
 
-## 隐私与脱敏
+## 隐私说明
 
 本公开预览刻意保持厂商中立：不包含私有项目名、私有 URL、内部规划笔记或组织专属部署说明。
 

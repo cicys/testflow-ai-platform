@@ -45,7 +45,7 @@ Executors
     executor.stderr.log
 ```
 
-`manifest.json` 记录运行 id、执行器类型、数据集版本、已脱敏的执行器配置以及可选的追踪字段。
+`manifest.json` 记录运行 id、执行器类型、数据集版本、不含密钥等敏感字段的执行器配置快照以及可选的追踪字段。
 
 `predictions.jsonl` 是样本级对比面，每行建议包含：
 
