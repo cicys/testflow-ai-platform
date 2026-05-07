@@ -1,7 +1,7 @@
-# GitHub Remote Preference
+# GitHub 远程仓库偏好
 
-- Preferred GitHub namespace/user: `cicys`
-- Preferred repository URL format: `git@github.com:cicys/<repo>.git`
-- Current project canonical remote: `git@github.com:cicys/testflow-ai-platform.git`
+- 首选 GitHub 命名空间/用户：`cicys`
+- 首选仓库 URL 形式：`git@github.com:cicys/<repo>.git`
+- 本项目的规范远程：`git@github.com:cicys/testflow-ai-platform.git`
 
-When creating or updating remotes for this project, prefer SSH URLs under the `cicys` namespace.
+为本项目创建或更新远程时，优先使用 `cicys` 命名空间下的 SSH URL。

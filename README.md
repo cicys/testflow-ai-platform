@@ -1,27 +1,28 @@
 # TestFlow AI Platform
 
-TestFlow AI Platform is a lightweight run ledger and executor framework for AI-assisted testing workflows.
+TestFlow AI Platform 是一套轻量级的运行台账（run ledger）与执行器框架，面向 AI 辅助的测试与评估工作流。
 
-It provides a small, local-first foundation for:
+本仓库提供小而稳的本地优先能力，包括：
 
-- Creating reproducible test and evaluation runs.
-- Writing run artifacts in a stable layout.
-- Running dependency-free smoke checks with `mock`.
-- Running command-based checks with `oversee`, `pytest`, or `subprocess`.
-- Comparing run summaries and sample-level predictions.
-- Triggering runs from an assistant or agent runtime through a small skill wrapper.
+- 创建可复现的测试与评估运行。
+- 按固定布局写入运行产物（artifacts）。
+- 使用 `mock` 执行器做无外部依赖的冒烟验证。
+- 使用 `oversee`、`pytest` 或 `subprocess` 执行基于命令的检查。
+- 对比运行摘要与样本级预测（predictions）。
+- 通过会话、用例批次、覆盖校验与用例执行进度，管理偏「技能化」的测试工作流。
+- 通过小型 skill 封装，由助手或智能体运行时触发运行。
 
-## Status
+## 状态
 
-This repository is an early public preview. The current focus is the core run ledger, artifact layout, CLI, and executor interface.
+当前为早期公开预览阶段，重心在核心台账、产物布局、CLI 与执行器接口。
 
-## Install
+## 安装
 
 ```bash
 python3 -m pip install -e ".[dev]"
 ```
 
-## Quick Start
+## 快速开始
 
 ```bash
 export TESTFLOW_HOME="$(pwd)/.testflow"
@@ -38,7 +39,19 @@ testflow run execute "$RUN_B"
 testflow run diff "$RUN_A" "$RUN_A" --sample-key sample_id
 ```
 
-Artifacts are written to:
+技能工具集（Skill Toolkit）相关命令：
+
+```bash
+testflow toolkit list
+testflow toolkit session create demo-project
+testflow toolkit case merge-batches <session_id>
+testflow toolkit case validate <session_id>
+testflow toolkit case init-registry <session_id>
+testflow toolkit case update-status <session_id> TC-BIZ-001 passed --executor oversee
+testflow toolkit case progress <session_id>
+```
+
+产物写入路径示例：
 
 ```text
 .testflow/
@@ -61,18 +74,24 @@ testflow run create --executor oversee --config-file examples/configs/oversee-sm
 testflow run execute <run_id>
 testflow run diff <run_a> <run_b>
 testflow dataset register-version smoke-v1 --label "Smoke dataset"
+testflow toolkit list
+testflow toolkit session create demo-project
+testflow toolkit case merge-batches <session_id>
+testflow toolkit case validate <session_id>
+testflow toolkit case init-registry <session_id>
+testflow toolkit case update-status <session_id> <case_id> passed
 ```
 
-## Executors
+## 执行器
 
-| Executor | Purpose |
+| 执行器 | 用途 |
 |---|---|
-| `mock` | Dependency-free smoke executor that emits deterministic predictions. |
-| `oversee` | Command-based monitoring/check executor for scripts, pytest, or other local commands. |
-| `pytest` | Alias for the command-based executor. |
-| `subprocess` | Generic command execution mode. |
+| `mock` | 无外部依赖的冒烟执行器，输出确定性预测。 |
+| `oversee` | 基于命令的监控/检查执行器，适合脚本、pytest 或其他本地命令。 |
+| `pytest` | 上述命令执行器的别名。 |
+| `subprocess` | 通用子进程命令执行模式。 |
 
-`oversee` accepts a JSON config:
+`oversee` 接受 JSON 配置，例如：
 
 ```json
 {
@@ -81,27 +100,30 @@ testflow dataset register-version smoke-v1 --label "Smoke dataset"
 }
 ```
 
-If `junit_xml` is provided, TestFlow maps test cases into `predictions.jsonl`; otherwise it writes one command-level prediction.
+若提供 `junit_xml`，TestFlow 会将测试用例映射到 `predictions.jsonl`；否则写入一条命令级预测记录。
 
-## Assistant Skill
+## 助手 Skill
 
-The optional skill wrapper in `skills/testflow-run/` lets an assistant or agent runtime trigger a run and return a Markdown summary.
+`skills/testflow-run/` 中的可选封装让助手或智能体运行时能够触发一次运行并返回 Markdown 摘要。
 
 ```bash
 cd skills/testflow-run
 python3 scripts/run_testflow.py --executor mock
 ```
 
-## Documentation
+## 文档
 
-- [Architecture](docs/architecture.md)
-- [Roadmap](docs/roadmap.md)
-- [Release Checklist](docs/release-checklist.md)
+- [架构说明](docs/architecture.md)
+- [Skill Toolkit](docs/skill-toolkit.md)
+- [路线图](docs/roadmap.md)
+- [公开发布检查清单](docs/release-checklist.md)
+- [产品概览（脱敏摘要）](docs/overview-product-zh.md)
+- [可行性摘要（脱敏）](docs/feasibility-summary-zh.md)
 
-## Privacy And Sanitization
+## 隐私与脱敏
 
-This public preview is intentionally vendor-neutral. It does not include private project names, private URLs, internal planning notes, or organization-specific deployment instructions.
+本公开预览刻意保持厂商中立：不包含私有项目名、私有 URL、内部规划笔记或组织专属部署说明。
 
-## License
+## 许可证
 
-MIT License. See `LICENSE`.
+MIT License，详见 `LICENSE`。

@@ -1,31 +1,29 @@
-# Contributing
+# 贡献指南
 
-Thanks for contributing to TestFlow AI.
+感谢你对 TestFlow AI Platform 的贡献。
 
-## Development Setup
+## 开发环境
 
 ```bash
 python3 -m pip install -e ".[dev]"
 pytest -q
 ```
 
-## Pull Request Guidelines
+## Pull Request 约定
 
-- Keep changes focused and small.
-- Add or update tests for behavior changes.
-- Keep public docs vendor-neutral.
-- Do not include private URLs, tokens, or internal paths.
+- 变更聚焦、尽量小而清晰。
+- 行为变更请新增或更新测试。
+- 公开文档保持厂商中立表述。
+- 不要提交私有 URL、令牌或内部路径。
 
-## Code Style
+## 代码风格
 
 ```bash
 ruff check src tests
 ```
 
-## Issue Reports
+## 报告问题时请附上
 
-Please include:
-
-- Reproduction steps
-- Expected vs actual behavior
-- Environment details (OS, Python version)
+- 复现步骤
+- 期望行为与实际行为
+- 环境信息（操作系统、Python 版本）

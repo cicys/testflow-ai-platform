@@ -1,43 +1,46 @@
-# Roadmap
+# 路线图
 
-This roadmap describes the public direction for TestFlow AI Platform without tying the project to any private implementation.
+本路线图描述 TestFlow AI 的公开演进方向，不绑定任何私有实现细节。
 
-## Phase 1: Local Core
+## 阶段 1：本地核心
 
-- SQLite-backed run ledger.
-- Stable artifact layout.
-- `mock` executor.
-- `oversee` command executor.
-- Sample-level diff.
-- CLI-first workflow.
-- Assistant skill wrapper.
+- 基于 SQLite 的运行台账。
+- 稳定的产物目录布局。
+- `mock` 执行器。
+- `oversee` 命令执行器。
+- 样本级 diff。
+- CLI 优先工作流。
+- 助手 skill 封装。
 
-## Phase 2: Execution Adapters
+## 阶段 2：执行适配
 
-- HTTP executor adapter.
-- Batch model evaluation adapter.
-- Richer pytest/JUnit ingestion.
-- Retry and timeout policies.
-- Configurable resource limits.
+- Skill Toolkit 会话存储。
+- 用例批次合并与校验工具。
+- 用例执行注册表与进度跟踪。
+- HTTP 执行器适配。
+- 批量模型评估适配。
+- 更丰富的 pytest/JUnit 摄取。
+- 重试与超时策略。
+- 可配置资源限制。
 
-## Phase 3: Collaboration
+## 阶段 3：协作
 
-- Optional API service.
-- Report generation.
-- Dataset import/export helpers.
-- Human review and annotation adapter interface.
+- 可选 API 服务。
+- 报告生成。
+- 数据集导入/导出辅助。
+- 人工评审与标注的适配接口。
 
-## Phase 4: Platform Features
+## 阶段 4：平台能力
 
-- Web dashboard.
-- Multi-user permissions.
-- Remote execution workers.
-- Pluggable observability integrations.
-- Scheduled monitoring workflows.
+- Web 控制台。
+- 多用户权限。
+- 远程执行 Worker。
+- 可插拔的可观测性集成。
+- 定时监控类工作流。
 
-## Non-goals For The Preview
+## 预览阶段的非目标
 
-- No bundled private integrations.
-- No organization-specific deployment scripts.
-- No hard dependency on a specific agent framework.
-- No hosted service requirement.
+- 不捆绑私有集成。
+- 不包含组织专属部署脚本。
+- 不硬依赖某一智能体框架。
+- 不要求必须接入托管服务。

@@ -1,25 +1,25 @@
-# Public Release Checklist
+# 公开发布检查清单
 
-Use this checklist before pushing a public GitHub repository.
+在向公开 GitHub 仓库推送前，建议逐项自检。
 
-## Source
+## 源代码
 
-- [ ] No private URLs.
-- [ ] No private project names.
-- [ ] No internal workspace paths.
-- [ ] No secrets, tokens, or credentials.
-- [ ] No generated run artifacts.
-- [ ] No local SQLite databases.
-- [ ] No cache directories.
+- [ ] 无私有 URL。
+- [ ] 无私有项目名。
+- [ ] 无内部工作区路径。
+- [ ] 无密钥、令牌或凭证。
+- [ ] 无生成的运行产物。
+- [ ] 无本地 SQLite 数据库。
+- [ ] 无缓存目录。
 
-## Documentation
+## 文档
 
-- [ ] README uses public product language only.
-- [ ] Docs describe generic adapters, not private migration plans.
-- [ ] Examples run on a clean machine.
-- [ ] The license is selected by maintainers.
+- [ ] README 仅使用对外产品语言。
+- [ ] 文档描述通用适配器，而非私有迁移计划。
+- [ ] 示例可在干净机器上运行。
+- [ ] 许可证已由维护者选定。
 
-## Validation
+## 校验命令
 
 ```bash
 python3 -m pip install -e ".[dev]"
@@ -32,10 +32,10 @@ testflow run execute "$RUN"
 testflow run diff "$RUN" "$RUN"
 ```
 
-## Suggested Git Commands
+## 建议的 Git 命令示例
 
 ```bash
-cd testflow-ai-platform
+cd public-release
 git init
 git add .
 git status

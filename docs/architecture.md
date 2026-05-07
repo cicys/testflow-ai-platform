@@ -1,37 +1,39 @@
-# Architecture
+# 架构
 
-TestFlow AI Platform is organized around a small set of stable contracts.
+TestFlow AI 围绕一组小而稳定的契约组织代码。
 
-## Layers
+## 分层
 
 ```text
-Assistant / CLI / API
+助手 / CLI / API
         |
         v
 TestFlow Core
-  - Run ledger
-  - Artifact layout
-  - Diff and summary
-  - Executor registry
+  - 运行台账
+  - 产物布局
+  - Diff 与摘要
+  - 执行器注册
+  - Skill Toolkit 会话
         |
         v
 Executors
   - mock
   - oversee / pytest / subprocess
-  - future adapters
+  - 后续适配器
 ```
 
-## Core Concepts
+## 核心概念
 
-| Concept | Meaning |
+| 概念 | 含义 |
 |---|---|
-| `DatasetVersion` | A reproducible reference to test or evaluation inputs. |
-| `Run` | One execution attempt with an executor, config snapshot, status, and artifacts. |
-| `Prediction` | Sample-level output written as JSON Lines. |
-| `MetricResult` | A named metric attached to a run. |
-| `Artifact` | Files written under `.testflow/artifacts/runs/<run_id>/`. |
+| `DatasetVersion` | 对测试或评估输入的可复现引用。 |
+| `Run` | 一次执行尝试，包含执行器、配置快照、状态与产物。 |
+| `Prediction` | 样本级输出，以 JSON Lines 形式写入。 |
+| `MetricResult` | 挂载在某个运行上的命名指标。 |
+| `Artifact` | 写入 `.testflow/artifacts/runs/<run_id>/` 下的文件。 |
+| `ToolkitSession` | 多步规划、用例管理与进度跟踪所用的工作流产物目录。 |
 
-## Artifact Layout
+## 产物布局
 
 ```text
 .testflow/artifacts/runs/<run_id>/
@@ -43,44 +45,55 @@ Executors
     executor.stderr.log
 ```
 
-`manifest.json` captures the run id, executor type, dataset version, sanitized executor config, and optional trace fields.
+`manifest.json` 记录运行 id、执行器类型、数据集版本、已脱敏的执行器配置以及可选的追踪字段。
 
-`predictions.jsonl` is the sample-level comparison surface. Each row should include:
+`predictions.jsonl` 是样本级对比面，每行建议包含：
 
 ```json
 {"sample_id":"case-001","output":{"label":"ok"},"error":null}
 ```
 
-`summary.json` is the run-level reporting surface. It should include status, counts, and metrics.
+`summary.json` 是运行级报告面，应包含状态、计数与指标。
 
-## Executor Contract
+## 执行器契约
 
-Executors receive:
+执行器接收：
 
 - `run_id`
 - `artifact_root`
 - `config`
 
-Executors must:
+执行器必须：
 
-- Write only under `artifact_root`.
-- Write `predictions.jsonl` and `summary.json`.
-- Return an exit code and summary.
-- Never write secrets to the manifest or logs intentionally.
+- 仅在 `artifact_root` 下写入。
+- 写入 `predictions.jsonl` 与 `summary.json`。
+- 返回退出码与摘要。
+- 避免在 manifest 或日志中故意写入密钥。
 
-## Built-in Executors
+## 内置执行器
 
-`mock` emits deterministic predictions and is used for smoke testing.
+`mock` 输出确定性预测，用于冒烟测试。
 
-`oversee` runs local commands and maps stdout, stderr, exit code, and optional JUnit XML into TestFlow artifacts. It is intended for monitoring-style checks, scheduled validations, pytest suites, and shell-friendly tools.
+`oversee` 在本地执行命令，并将 stdout、stderr、退出码以及可选的 JUnit XML 映射为 TestFlow 产物，适用于监控式检查、定时校验、pytest 套件以及 shell 友好工具。
 
-## Extension Points
+## 扩展点
 
-Future adapters can be added without changing the ledger schema:
+未来可在不改动台账模式的前提下增加适配器：
 
-- API test runners
-- UI automation runners
-- model evaluation jobs
-- batch inference jobs
-- remote execution services
-- reporting backends
+- API 测试运行器
+- UI 自动化运行器
+- 模型评估任务
+- 批量推理任务
+- 远程执行服务
+- 报告后端
+
+## Skill Toolkit 层
+
+工具集层提供不绑定单次运行的流程能力：
+
+- 会话产物管理。
+- 用例批次合并。
+- 用例覆盖校验。
+- 用例执行注册表与进度跟踪。
+
+这些能力通过 `testflow toolkit ...` 暴露，后续可由 API 服务、助手 skill 或工具服务器封装。

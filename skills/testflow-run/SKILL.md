@@ -1,20 +1,20 @@
 # TestFlow Run
 
-Use this skill when an agent or assistant should create and execute a local TestFlow run.
+当智能体或助手需要创建并执行一次本地 TestFlow 运行时使用本 skill。
 
-## Capabilities
+## 能力
 
-- Creates a TestFlow run through the public `testflow` CLI.
-- Executes the run with `mock`, `oversee`, `pytest`, or `subprocess`.
-- Prints a Markdown summary with the run id, status, executor, and artifact path.
+- 通过公开的 `testflow` CLI 创建 TestFlow 运行。
+- 使用 `mock`、`oversee`、`pytest` 或 `subprocess` 执行运行。
+- 输出 Markdown 摘要，包含运行 id、状态、执行器与产物路径。
 
-## Examples
+## 示例
 
 ```bash
 python3 scripts/run_testflow.py --executor mock
 ```
 
-Oversee-style command execution:
+类似 Oversee 的命令执行：
 
 ```bash
 python3 scripts/run_testflow.py \
@@ -22,7 +22,7 @@ python3 scripts/run_testflow.py \
   --config-json '{"command":["python3","-c","print(\"ok\")"]}'
 ```
 
-## Notes
+## 说明
 
-- Keep complex test logic outside this skill. Pass configuration to TestFlow as JSON.
-- Do not place secrets in `--config-json`; use environment variables or your secret manager.
+- 复杂测试逻辑应放在本 skill 之外，通过 JSON 将配置传给 TestFlow。
+- 勿在 `--config-json` 中放置密钥；请使用环境变量或密钥管理服务。
