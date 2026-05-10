@@ -1,5 +1,14 @@
 # 变更日志
 
+## 0.2.0 - API 套件、Agent Gateway、报告与 CaseOps
+
+- 同步 `public-release`：`api_suite`、`agent_gateway` 执行器，`api_testing` 套件运行器。
+- 新增 Markdown 报告：`testflow report run|artifacts|session`；工具集 `reporting` 领域。
+- 新增 CaseOps 工具命令：`testflow toolkit caseops payload|submit`（环境变量配置端点）。
+- 补充示例 `examples/api_suites/`、`examples/configs/api-suite-smoke.json`。
+- 新增中文文档：`docs/api-suite.md`、`docs/reporting.md`、`docs/qa-adapters.md`。
+- 测试扩展：`test_api_suite`、`test_reports`、`test_caseops_and_agent_gateway`。
+
 ## 0.1.2 - 文档措辞
 
 - 统一调整 README、架构文档与摘要类文档中的备注用语，使之更中性。

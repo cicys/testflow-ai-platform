@@ -8,13 +8,17 @@ TestFlow AI Platform 是一套轻量级的运行台账（run ledger）与执行�
 - 按固定布局写入运行产物（artifacts）。
 - 使用 `mock` 执行器做无外部依赖的冒烟验证。
 - 使用 `oversee`、`pytest` 或 `subprocess` 执行基于命令的检查。
+- 使用 **`api_suite`** 执行 JSON 描述的 HTTP 接口套件。
+- 使用 **`agent_gateway`** 调用对话式自动化服务端点。
 - 对比运行摘要与样本级预测（predictions）。
-- 通过会话、用例批次、覆盖校验与用例执行进度，管理偏「技能化」的测试工作流。
+- 通过会话、用例批次、覆盖校验与执行进度，管理偏「技能化」的测试工作流。
+- 从运行或工具集会话生成 **Markdown 报告**。
+- 通过 **`toolkit caseops`** 构造或提交通用 CaseOps 载荷（端点由环境变量配置）。
 - 通过小型 skill 封装，由助手或智能体运行时触发运行。
 
 ## 状态
 
-当前为早期公开预览阶段，重心在核心台账、产物布局、CLI 与执行器接口。
+当前为早期公开预览阶段；核心台账与多种执行器、报告能力已可本地运行。
 
 ## 安装
 
@@ -39,16 +43,31 @@ testflow run execute "$RUN_B"
 testflow run diff "$RUN_A" "$RUN_A" --sample-key sample_id
 ```
 
-技能工具集（Skill Toolkit）相关命令：
+HTTP API 套件校验与执行：
+
+```bash
+testflow api validate-suite examples/api_suites/http-smoke.json
+
+RUN_C=$(testflow run create \
+  --executor api_suite \
+  --config-json '{"suite_file":"examples/api_suites/http-smoke.json"}')
+testflow run execute "$RUN_C"
+```
+
+技能工具集与报告：
 
 ```bash
 testflow toolkit list
+testflow toolkit list --domain reporting
 testflow toolkit session create demo-project
 testflow toolkit case merge-batches <session_id>
 testflow toolkit case validate <session_id>
 testflow toolkit case init-registry <session_id>
 testflow toolkit case update-status <session_id> TC-BIZ-001 passed --executor oversee
 testflow toolkit case progress <session_id>
+
+testflow report run "$RUN_A"
+testflow report session <session_id>
 ```
 
 产物写入路径示例：
@@ -65,21 +84,26 @@ testflow toolkit case progress <session_id>
         logs/
 ```
 
-## CLI
+## CLI（节选）
 
 ```bash
 testflow init
 testflow run create --executor mock
 testflow run create --executor oversee --config-file examples/configs/oversee-smoke.json
+testflow run create --executor api_suite --config-json '{"suite_file":"examples/api_suites/http-smoke.json"}'
 testflow run execute <run_id>
 testflow run diff <run_a> <run_b>
 testflow dataset register-version smoke-v1 --label "Smoke dataset"
+
+testflow api validate-suite examples/api_suites/http-smoke.json
+testflow api run-suite examples/api_suites/http-smoke.json
+
+testflow report run <run_id>
+testflow report artifacts .testflow/artifacts/runs/<run_id>
+testflow report session <session_id>
+
 testflow toolkit list
-testflow toolkit session create demo-project
-testflow toolkit case merge-batches <session_id>
-testflow toolkit case validate <session_id>
-testflow toolkit case init-registry <session_id>
-testflow toolkit case update-status <session_id> <case_id> passed
+testflow toolkit caseops payload --owner tester --project-id sprint-1 --description "smoke ok" --status passed
 ```
 
 ## 执行器
@@ -90,8 +114,10 @@ testflow toolkit case update-status <session_id> <case_id> passed
 | `oversee` | 基于命令的监控/检查执行器，适合脚本、pytest 或其他本地命令。 |
 | `pytest` | 上述命令执行器的别名。 |
 | `subprocess` | 通用子进程命令执行模式。 |
+| `api_suite` | 执行 JSON 定义的 HTTP 套件，按 case 写入预测与详细报告。 |
+| `agent_gateway` | 调用对话式自动化服务，将响应写入产物。 |
 
-`oversee` 接受 JSON 配置，例如：
+`oversee` 配置示例：
 
 ```json
 {
@@ -100,11 +126,31 @@ testflow toolkit case update-status <session_id> <case_id> passed
 }
 ```
 
-若提供 `junit_xml`，TestFlow 会将测试用例映射到 `predictions.jsonl`；否则写入一条命令级预测记录。
+`agent_gateway` 配置示例：
+
+```json
+{
+  "base_url": "http://localhost:8080",
+  "endpoint": "/chat/sync",
+  "message": "执行冒烟检查",
+  "timeout_seconds": 120
+}
+```
+
+`api_suite` 配置示例：
+
+```json
+{
+  "suite_file": "examples/api_suites/http-smoke.json",
+  "timeout_seconds": 30
+}
+```
+
+若提供 `junit_xml`，TestFlow 会将测试用例映射到 `predictions.jsonl`；否则 oversee/subprocess 路径可写入命令级预测。
 
 ## 助手 Skill
 
-`skills/testflow-run/` 中的可选封装让助手或智能体运行时能够触发一次运行并返回 Markdown 摘要。
+`skills/testflow-run/` 中的封装可触发一次运行并打印 Markdown 摘要。
 
 ```bash
 cd skills/testflow-run
@@ -114,7 +160,10 @@ python3 scripts/run_testflow.py --executor mock
 ## 文档
 
 - [架构说明](docs/architecture.md)
+- [API 套件](docs/api-suite.md)
+- [报告](docs/reporting.md)
 - [Skill Toolkit](docs/skill-toolkit.md)
+- [QA 适配（Agent Gateway / CaseOps）](docs/qa-adapters.md)
 - [路线图](docs/roadmap.md)
 - [公开发布检查清单](docs/release-checklist.md)
 - [产品概览](docs/overview-product-zh.md)

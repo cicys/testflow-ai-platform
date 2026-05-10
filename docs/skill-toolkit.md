@@ -45,6 +45,10 @@ testflow toolkit list
 | `init_case_registry` | tracking | 基于用例集合创建 `case_registry.json`。 |
 | `update_case_status` | tracking | 更新单条用例状态。 |
 | `get_execution_progress` | tracking | 汇报执行与通过率进度。 |
+| `build_session_report` | reporting | 基于工具集会话生成 Markdown 报告。 |
+| `build_run_artifact_report` | reporting | 基于某次运行的产物目录生成 Markdown 报告。 |
+
+按领域筛选：`testflow toolkit list --domain reporting`。
 
 ## 用例批次格式
 

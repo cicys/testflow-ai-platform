@@ -53,7 +53,11 @@ def main() -> None:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Create and execute a TestFlow run.")
-    parser.add_argument("--executor", default="mock", help="mock, oversee, pytest, or subprocess")
+    parser.add_argument(
+        "--executor",
+        default="mock",
+        help="mock | oversee | pytest | subprocess | api_suite | agent_gateway",
+    )
     parser.add_argument("--dataset-version", default="")
     parser.add_argument("--config-json", default="")
     return parser.parse_args()

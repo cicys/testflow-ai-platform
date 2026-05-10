@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from typing import Callable
 
 from testflow_ai.toolkits import cases as cases
+from testflow_ai.toolkits import reports as reports
 from testflow_ai.toolkits import sessions as sessions
 
 
@@ -72,6 +73,18 @@ BUILTIN_TOOLS: tuple[ToolSpec, ...] = (
         domain="tracking",
         summary="Return execution and pass-rate progress from case_registry.json.",
         handler=cases.get_execution_progress,
+    ),
+    ToolSpec(
+        name="build_session_report",
+        domain="reporting",
+        summary="Build a Markdown report from a toolkit session.",
+        handler=reports.build_session_report,
+    ),
+    ToolSpec(
+        name="build_run_artifact_report",
+        domain="reporting",
+        summary="Build a Markdown report from a run artifact directory.",
+        handler=reports.build_run_artifact_report,
     ),
 )
 

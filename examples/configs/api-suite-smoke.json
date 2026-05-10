@@ -1,0 +1,4 @@
+{
+  "suite_file": "examples/api_suites/http-smoke.json",
+  "timeout_seconds": 30
+}

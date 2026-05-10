@@ -1,0 +1,54 @@
+{
+  "suite_id": "http-smoke",
+  "name": "HTTP smoke suite",
+  "base_url": "http://localhost:8080",
+  "headers": {
+    "User-Agent": "TestFlow"
+  },
+  "variables": {
+    "project_id": "demo"
+  },
+  "cases": [
+    {
+      "case_id": "case-api-001",
+      "name": "health and project lookup",
+      "tags": ["smoke"],
+      "steps": [
+        {
+          "step_id": "health",
+          "name": "read health endpoint",
+          "method": "GET",
+          "endpoint": "/health",
+          "assertions": [
+            {
+              "kind": "status_code",
+              "expected": 200
+            },
+            {
+              "kind": "response_time_ms",
+              "operator": "less_than",
+              "expected": 1000
+            }
+          ]
+        },
+        {
+          "step_id": "project",
+          "name": "read project endpoint",
+          "method": "GET",
+          "endpoint": "/projects/{{project_id}}",
+          "assertions": [
+            {
+              "kind": "status_code",
+              "expected": 200
+            },
+            {
+              "kind": "json_path",
+              "path": "$.id",
+              "expected": "demo"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
