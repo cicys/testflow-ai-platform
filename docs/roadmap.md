@@ -17,10 +17,13 @@
 - Skill Toolkit 会话存储。
 - 用例批次合并与校验工具。
 - 用例执行注册表与进度跟踪。
+- 本地 workflow 编排，用于规划、执行与报告状态推进。
 - API 套件运行器与 HTTP 执行适配。
+- UI 套件 schema 与 Playwright spec 编译。
 - Agent Gateway 执行器（对话式自动化服务）。
 - CaseOps 适配（用例与 CI/CD 元数据）。
 - 面向运行与会话的 Markdown 报告生成。
+- JSONL stdio Tool Server，用于本地 agent/runtime 调用 toolkit。
 - 批量模型评估适配（规划中）。
 - 更丰富的 pytest/JUnit 摄取。
 - 重试与超时策略。
@@ -30,6 +33,7 @@
 
 - 可选 API 服务。
 - 报告发布适配。
+- 标准 MCP server 适配。
 - 数据集导入/导出辅助。
 - 人工评审与标注适配接口。
 

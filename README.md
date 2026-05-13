@@ -9,9 +9,12 @@ TestFlow AI Platform 是一套轻量级的运行台账（run ledger）与执行�
 - 使用 `mock` 执行器做无外部依赖的冒烟验证。
 - 使用 `oversee`、`pytest` 或 `subprocess` 执行基于命令的检查。
 - 使用 **`api_suite`** 执行 JSON 描述的 HTTP 接口套件。
+- 使用 **`ui_suite`** 校验浏览器 UI 套件并生成 Playwright spec。
 - 使用 **`agent_gateway`** 调用对话式自动化服务端点。
 - 对比运行摘要与样本级预测（predictions）。
 - 通过会话、用例批次、覆盖校验与执行进度，管理偏「技能化」的测试工作流。
+- 使用 `workflow.json` 跟踪从需求分析到执行、报告、发布检查的项目流程。
+- 通过 JSONL stdio **Tool Server** 将 toolkit 能力暴露给本地 agent 或脚本。
 - 从运行或工具集会话生成 **Markdown 报告**。
 - 通过 **`toolkit caseops`** 构造或提交通用 CaseOps 载荷（端点由环境变量配置）。
 - 通过小型 skill 封装，由助手或智能体运行时触发运行。
@@ -54,6 +57,18 @@ RUN_C=$(testflow run create \
 testflow run execute "$RUN_C"
 ```
 
+浏览器 UI 套件校验与编译：
+
+```bash
+testflow ui validate-suite examples/ui_suites/browser-smoke.json
+testflow ui compile-suite examples/ui_suites/browser-smoke.json --output /tmp/browser-smoke.spec.ts
+
+RUN_D=$(testflow run create \
+  --executor ui_suite \
+  --config-json '{"suite_file":"examples/ui_suites/browser-smoke.json"}')
+testflow run execute "$RUN_D"
+```
+
 技能工具集与报告：
 
 ```bash
@@ -65,9 +80,22 @@ testflow toolkit case validate <session_id>
 testflow toolkit case init-registry <session_id>
 testflow toolkit case update-status <session_id> TC-BIZ-001 passed --executor oversee
 testflow toolkit case progress <session_id>
+testflow toolkit workflow start demo-project --routes api,ui
+testflow toolkit workflow next <session_id>
+testflow toolkit workflow complete <session_id> requirement_analysis --summary "Scope captured"
 
 testflow report run "$RUN_A"
 testflow report session <session_id>
+```
+
+Tool Server 预览：
+
+```bash
+printf '%s\n' \
+  '{"id":1,"method":"server.info"}' \
+  '{"id":2,"method":"tools.list","params":{"domain":"workflow"}}' \
+  '{"id":3,"method":"server.shutdown"}' \
+  | testflow server stdio
 ```
 
 产物写入路径示例：
@@ -97,12 +125,20 @@ testflow dataset register-version smoke-v1 --label "Smoke dataset"
 
 testflow api validate-suite examples/api_suites/http-smoke.json
 testflow api run-suite examples/api_suites/http-smoke.json
+testflow ui validate-suite examples/ui_suites/browser-smoke.json
+testflow ui plan-suite examples/ui_suites/browser-smoke.json
+testflow ui compile-suite examples/ui_suites/browser-smoke.json --output /tmp/browser-smoke.spec.ts
 
 testflow report run <run_id>
 testflow report artifacts .testflow/artifacts/runs/<run_id>
 testflow report session <session_id>
+testflow server stdio
 
 testflow toolkit list
+testflow toolkit workflow start demo-project --routes api,ui
+testflow toolkit workflow status <session_id>
+testflow toolkit workflow next <session_id>
+testflow toolkit workflow complete <session_id> <step_id> --summary "Done"
 testflow toolkit caseops payload --owner tester --project-id sprint-1 --description "smoke ok" --status passed
 ```
 
@@ -115,6 +151,7 @@ testflow toolkit caseops payload --owner tester --project-id sprint-1 --descript
 | `pytest` | 上述命令执行器的别名。 |
 | `subprocess` | 通用子进程命令执行模式。 |
 | `api_suite` | 执行 JSON 定义的 HTTP 套件，按 case 写入预测与详细报告。 |
+| `ui_suite` | 校验 JSON 定义的浏览器 UI 套件，生成计划与 Playwright spec。 |
 | `agent_gateway` | 调用对话式自动化服务，将响应写入产物。 |
 
 `oversee` 配置示例：
@@ -146,6 +183,14 @@ testflow toolkit caseops payload --owner tester --project-id sprint-1 --descript
 }
 ```
 
+`ui_suite` 配置示例：
+
+```json
+{
+  "suite_file": "examples/ui_suites/browser-smoke.json"
+}
+```
+
 若提供 `junit_xml`，TestFlow 会将测试用例映射到 `predictions.jsonl`；否则 oversee/subprocess 路径可写入命令级预测。
 
 ## 助手 Skill
@@ -161,7 +206,10 @@ python3 scripts/run_testflow.py --executor mock
 
 - [架构说明](docs/architecture.md)
 - [API 套件](docs/api-suite.md)
+- [UI 套件](docs/ui-suite.md)
 - [报告](docs/reporting.md)
+- [Workflow 编排](docs/workflow.md)
+- [Tool Server](docs/tool-server.md)
 - [Skill Toolkit](docs/skill-toolkit.md)
 - [QA 适配（Agent Gateway / CaseOps）](docs/qa-adapters.md)
 - [路线图](docs/roadmap.md)

@@ -1,0 +1,61 @@
+{
+  "suite_id": "browser-smoke",
+  "name": "Browser smoke suite",
+  "base_url": "http://localhost:3000",
+  "browser": "chromium",
+  "viewport": {
+    "width": 1280,
+    "height": 720
+  },
+  "variables": {
+    "email": "tester@example.com",
+    "password": "change-me"
+  },
+  "cases": [
+    {
+      "case_id": "case-ui-001",
+      "name": "login dashboard",
+      "tags": ["smoke"],
+      "steps": [
+        {
+          "step_id": "open-login",
+          "name": "open login page",
+          "action": "goto",
+          "url": "/login"
+        },
+        {
+          "step_id": "fill-email",
+          "name": "fill email",
+          "action": "fill",
+          "target": "[data-testid=email]",
+          "value": "{{email}}"
+        },
+        {
+          "step_id": "fill-password",
+          "name": "fill password",
+          "action": "fill",
+          "target": "[data-testid=password]",
+          "value": "{{password}}"
+        },
+        {
+          "step_id": "submit",
+          "name": "submit login",
+          "action": "click",
+          "target": "[data-testid=submit]"
+        },
+        {
+          "step_id": "assert-dashboard",
+          "name": "dashboard is visible",
+          "action": "assert_text",
+          "target": "h1",
+          "value": "Dashboard"
+        },
+        {
+          "step_id": "capture",
+          "name": "capture dashboard",
+          "action": "screenshot"
+        }
+      ]
+    }
+  ]
+}

@@ -6,6 +6,8 @@ from typing import Callable
 from testflow_ai.toolkits import cases as cases
 from testflow_ai.toolkits import reports as reports
 from testflow_ai.toolkits import sessions as sessions
+from testflow_ai.toolkits import ui as ui
+from testflow_ai.toolkits import workflows as workflows
 
 
 ToolHandler = Callable[..., dict]
@@ -85,6 +87,48 @@ BUILTIN_TOOLS: tuple[ToolSpec, ...] = (
         domain="reporting",
         summary="Build a Markdown report from a run artifact directory.",
         handler=reports.build_run_artifact_report,
+    ),
+    ToolSpec(
+        name="validate_ui_suite",
+        domain="ui",
+        summary="Validate a UI suite JSON file.",
+        handler=ui.validate_ui_suite,
+    ),
+    ToolSpec(
+        name="compile_ui_suite",
+        domain="ui",
+        summary="Compile a UI suite JSON file into a Playwright spec.",
+        handler=ui.compile_ui_suite,
+    ),
+    ToolSpec(
+        name="start_workflow",
+        domain="workflow",
+        summary="Create a session and initialize a testing workflow.",
+        handler=workflows.start_workflow,
+    ),
+    ToolSpec(
+        name="init_workflow",
+        domain="workflow",
+        summary="Initialize workflow.json for an existing session.",
+        handler=workflows.init_workflow,
+    ),
+    ToolSpec(
+        name="get_workflow_status",
+        domain="workflow",
+        summary="Return workflow progress and the current step.",
+        handler=workflows.get_workflow_status,
+    ),
+    ToolSpec(
+        name="get_next_step",
+        domain="workflow",
+        summary="Start and return the next workflow step.",
+        handler=workflows.get_next_step,
+    ),
+    ToolSpec(
+        name="complete_step",
+        domain="workflow",
+        summary="Complete, skip, or block one workflow step.",
+        handler=workflows.complete_step,
     ),
 )
 

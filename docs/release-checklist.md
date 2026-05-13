@@ -30,14 +30,18 @@ testflow init
 RUN=$(testflow run create --executor mock)
 testflow run execute "$RUN"
 testflow run diff "$RUN" "$RUN"
+testflow api validate-suite examples/api_suites/http-smoke.json
+testflow ui validate-suite examples/ui_suites/browser-smoke.json
+testflow report run "$RUN"
+testflow toolkit workflow start release-check --routes api,ui
+printf '%s\n' '{"id":1,"method":"server.info"}' '{"id":2,"method":"server.shutdown"}' | testflow server stdio
 ```
 
 ## 建议的 Git 命令示例
 
 ```bash
-cd public-release
-git init
+cd testflow-ai-platform
 git add .
 git status
-git commit -m "Initial public preview"
+git commit -m "feat: add ui suite and workflow orchestration"
 ```

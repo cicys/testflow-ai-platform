@@ -56,7 +56,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--executor",
         default="mock",
-        help="mock | oversee | pytest | subprocess | api_suite | agent_gateway",
+        help="mock | oversee | pytest | subprocess | api_suite | ui_suite | agent_gateway",
     )
     parser.add_argument("--dataset-version", default="")
     parser.add_argument("--config-json", default="")

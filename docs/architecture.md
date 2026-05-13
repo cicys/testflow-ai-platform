@@ -15,12 +15,15 @@ TestFlow Core
   - Markdown 报告
   - 执行器注册
   - Skill Toolkit 会话
+  - Workflow 状态
+  - Tool Server
         |
         v
 Executors
   - mock
   - oversee / pytest / subprocess
   - api_suite
+  - ui_suite
   - agent_gateway
   - 后续适配器
 ```
@@ -72,6 +75,8 @@ Executors
 
 `api_suite` 执行 JSON 描述的 HTTP 用例，校验断言、支持步骤间变量抽取，并为每个 API case 写入预测记录。
 
+`ui_suite` 校验 JSON 描述的浏览器 UI 流程，生成确定性执行计划，并编译 Playwright spec。
+
 `agent_gateway` 调用对话式自动化服务，将响应写入预测与日志产物。
 
 ## 扩展点
@@ -85,3 +90,11 @@ Executors
 ## 报告层
 
 报告层读取稳定的产物格式，生成 Markdown 摘要；支持单次运行目录与工具集会话，所有执行器可共用同一报告面，无需绑定私有发布系统。
+
+## Workflow 层
+
+Workflow 层在工具集会话内维护 `workflow.json`，用于记录当前步骤、路由选择、完成摘要、阻塞原因与整体进度。它为后续 MCP/tool server、多智能体编排或远程执行提供稳定状态机。
+
+## Tool Server 层
+
+Tool Server 层通过 JSONL stdio 协议暴露 toolkit catalog。它不引入额外运行时依赖，适合本地 agent、脚本或未来 MCP 适配器复用同一批工具函数。

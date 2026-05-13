@@ -5,7 +5,7 @@
 ## 能力
 
 - 通过公开的 `testflow` CLI 创建 TestFlow 运行。
-- 使用 `mock`、`oversee`、`pytest`、`subprocess`、`api_suite` 或 `agent_gateway` 执行运行。
+- 使用 `mock`、`oversee`、`pytest`、`subprocess`、`api_suite`、`ui_suite` 或 `agent_gateway` 执行运行。
 - 输出 Markdown 摘要，包含运行 id、状态、执行器与产物路径。
 
 ## 示例
@@ -28,6 +28,14 @@ HTTP 套件（api_suite）示例：
 python3 scripts/run_testflow.py \
   --executor api_suite \
   --config-json '{"suite_file":"examples/api_suites/http-smoke.json"}'
+```
+
+浏览器 UI 套件（ui_suite）示例：
+
+```bash
+python3 scripts/run_testflow.py \
+  --executor ui_suite \
+  --config-json '{"suite_file":"examples/ui_suites/browser-smoke.json"}'
 ```
 
 ## 说明

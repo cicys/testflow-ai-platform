@@ -1,6 +1,6 @@
 # Prompts Index
 
-来源：飞书 Wiki `prompt` 页面（已整理为可复用模板）。
+来源：内部知识库 `prompt` 页面（已整理为可复用模板）。
 
 ## engineering/
 

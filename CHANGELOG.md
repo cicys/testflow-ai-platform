@@ -1,5 +1,16 @@
 # 变更日志
 
+## 0.3.0 - UI 套件与 Workflow 编排
+
+- 新增 `ui_suite` / `browser_suite`：支持校验 JSON UI 套件、生成执行计划，并编译 Playwright spec。
+- 新增 `testflow ui validate-suite|plan-suite|compile-suite` 命令。
+- 新增工具集 `ui` 领域：`validate_ui_suite`、`compile_ui_suite`。
+- 新增本地 workflow 编排：`workflow.json`、下一步推进、步骤完成/阻塞、进度统计。
+- 新增 `testflow toolkit workflow start|init|status|next|complete|block` 命令。
+- 新增 JSONL stdio Tool Server：`testflow server stdio`，可列出和调用 toolkit catalog 工具。
+- 补充 UI 套件和 workflow 文档、示例与测试。
+- 修复公开 Prompt 索引中的内部协作平台命名残留。
+
 ## 0.2.0 - API 套件、Agent Gateway、报告与 CaseOps
 
 - 同步 `public-release`：`api_suite`、`agent_gateway` 执行器，`api_testing` 套件运行器。
