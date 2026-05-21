@@ -475,6 +475,108 @@ def toolkit_workflow_complete(
     )
 
 
+@workflow_app.command("create-run")
+def toolkit_workflow_create_run(
+    session_id: str = typer.Argument(...),
+    step_id: str = typer.Argument(...),
+    executor: str = typer.Option(..., "--executor", "-e"),
+    dataset_version: str = typer.Option("", "--dataset-version", "-d"),
+    config_json: str | None = typer.Option(None, "--config-json"),
+    config_file: Path | None = typer.Option(None, "--config-file", readable=True),
+) -> None:
+    """Create a TestFlow run and link it to a workflow step."""
+    config = _load_config(config_json, config_file)
+    typer.echo(
+        json.dumps(
+            workflows.create_linked_run(
+                session_id=session_id,
+                step_id=step_id,
+                executor_type=executor,
+                dataset_version_id=dataset_version,
+                config=config,
+            ),
+            indent=2,
+            ensure_ascii=False,
+        )
+    )
+
+
+@workflow_app.command("link-run")
+def toolkit_workflow_link_run(
+    session_id: str = typer.Argument(...),
+    step_id: str = typer.Argument(...),
+    run_id: str = typer.Argument(...),
+    executor: str = typer.Option("", "--executor", "-e"),
+    artifact_root: str = typer.Option("", "--artifact-root"),
+    status: str = typer.Option("", "--status"),
+    summary: str = typer.Option("", "--summary"),
+) -> None:
+    """Link an existing TestFlow run to a workflow step."""
+    typer.echo(
+        json.dumps(
+            workflows.link_run(
+                session_id=session_id,
+                step_id=step_id,
+                run_id=run_id,
+                executor_type=executor,
+                artifact_root=artifact_root,
+                status=status,
+                summary=summary,
+            ),
+            indent=2,
+            ensure_ascii=False,
+        )
+    )
+
+
+@workflow_app.command("sync-run")
+def toolkit_workflow_sync_run(
+    session_id: str = typer.Argument(...),
+    step_id: str = typer.Argument(...),
+    run_id: str = typer.Argument(...),
+    complete_on_terminal: bool = typer.Option(True, "--complete-on-terminal/--no-complete-on-terminal"),
+) -> None:
+    """Sync a linked run status back to a workflow step."""
+    typer.echo(
+        json.dumps(
+            workflows.sync_run_status(
+                session_id=session_id,
+                step_id=step_id,
+                run_id=run_id,
+                complete_on_terminal=complete_on_terminal,
+            ),
+            indent=2,
+            ensure_ascii=False,
+        )
+    )
+
+
+@workflow_app.command("record-artifact")
+def toolkit_workflow_record_artifact(
+    session_id: str = typer.Argument(...),
+    step_id: str = typer.Argument(...),
+    name: str = typer.Argument(...),
+    path: str = typer.Argument(...),
+    kind: str = typer.Option("artifact", "--kind"),
+    summary: str = typer.Option("", "--summary"),
+) -> None:
+    """Record an artifact produced by a workflow step."""
+    typer.echo(
+        json.dumps(
+            workflows.record_step_artifact(
+                session_id=session_id,
+                step_id=step_id,
+                name=name,
+                path=path,
+                kind=kind,
+                summary=summary,
+            ),
+            indent=2,
+            ensure_ascii=False,
+        )
+    )
+
+
 @workflow_app.command("block")
 def toolkit_workflow_block(
     session_id: str = typer.Argument(...),

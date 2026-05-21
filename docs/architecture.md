@@ -93,7 +93,7 @@ Executors
 
 ## Workflow 层
 
-Workflow 层在工具集会话内维护 `workflow.json`，用于记录当前步骤、路由选择、完成摘要、阻塞原因与整体进度。它为后续 MCP/tool server、多智能体编排或远程执行提供稳定状态机。
+Workflow 层在工具集会话内维护 `workflow.json`，用于记录当前步骤、路由选择、完成摘要、阻塞原因与整体进度。执行类步骤可以关联 run ledger 中的运行记录，并在执行结束后把状态同步回步骤。它为后续 MCP/tool server、多智能体编排或远程执行提供稳定状态机。
 
 ## Tool Server 层
 

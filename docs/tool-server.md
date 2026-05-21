@@ -55,10 +55,29 @@ testflow server stdio
 
 `arguments` 会按关键字参数传给工具函数。
 
+Workflow 相关工具也可通过同一入口调用，例如创建并关联一次运行：
+
+```json
+{
+  "id": 4,
+  "method": "tools.call",
+  "params": {
+    "name": "create_linked_run",
+    "arguments": {
+      "session_id": "demo-project_20260101_000000",
+      "step_id": "api_suite_execution",
+      "executor_type": "mock"
+    }
+  }
+}
+```
+
+常用 workflow 工具包括 `start_workflow`、`get_next_step`、`create_linked_run`、`sync_run_status`、`record_step_artifact`。
+
 ### `server.shutdown`
 
 ```json
-{"id":4,"method":"server.shutdown"}
+{"id":5,"method":"server.shutdown"}
 ```
 
 让 stdio 循环退出。

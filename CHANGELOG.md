@@ -7,6 +7,7 @@
 - 新增工具集 `ui` 领域：`validate_ui_suite`、`compile_ui_suite`。
 - 新增本地 workflow 编排：`workflow.json`、下一步推进、步骤完成/阻塞、进度统计。
 - 新增 `testflow toolkit workflow start|init|status|next|complete|block` 命令。
+- 新增 workflow 与 run ledger 关联：创建/关联/同步运行，并记录步骤产物。
 - 新增 JSONL stdio Tool Server：`testflow server stdio`，可列出和调用 toolkit catalog 工具。
 - 补充 UI 套件和 workflow 文档、示例与测试。
 - 修复公开 Prompt 索引中的内部协作平台命名残留。

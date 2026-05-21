@@ -59,12 +59,59 @@ testflow toolkit workflow complete <session_id> requirement_analysis \
   --artifact 01_requirement_analysis.json
 ```
 
+为执行步骤创建并关联一次运行：
+
+```bash
+testflow toolkit workflow create-run <session_id> api_suite_execution \
+  --executor api_suite \
+  --config-json '{"suite_file":"examples/api_suites/http-smoke.json"}'
+```
+
+执行完成后，把 run ledger 中的状态同步回 workflow：
+
+```bash
+testflow run execute <run_id>
+testflow toolkit workflow sync-run <session_id> api_suite_execution <run_id>
+```
+
+关联已有运行：
+
+```bash
+testflow toolkit workflow link-run <session_id> api_suite_execution <run_id> \
+  --executor api_suite \
+  --artifact-root .testflow/artifacts/runs/<run_id> \
+  --status succeeded
+```
+
+记录步骤产物：
+
+```bash
+testflow toolkit workflow record-artifact <session_id> api_suite_preparation api-suite api_suite.json \
+  --kind suite \
+  --summary "API suite is ready"
+```
+
 阻塞步骤：
 
 ```bash
 testflow toolkit workflow block <session_id> api_suite_execution \
   --reason "Target service is unavailable"
 ```
+
+## 运行关联
+
+`create-run` 会创建标准 TestFlow run、初始化运行产物目录，并在 `workflow.json` 的对应步骤下写入 `runs` 列表。
+
+步骤可以同时记录两类关联信息：
+
+- `runs`：与 run ledger 对应的执行记录，包括 `run_id`、执行器、状态和产物根目录。
+- `artifacts`：步骤过程中产生的补充产物，例如 suite 定义、测试计划、截图索引或报告路径。
+
+`sync-run` 会读取本地 run ledger 与 `summary.json`：
+
+- run 成功时，默认将步骤标记为 `completed`。
+- run 失败时，默认将步骤标记为 `blocked`。
+- 使用 `--no-complete-on-terminal` 可以只同步 run 状态，不推进步骤状态。
 
 ## 工具目录
 
@@ -81,3 +128,7 @@ testflow toolkit list --domain workflow
 - `get_workflow_status`
 - `get_next_step`
 - `complete_step`
+- `create_linked_run`
+- `link_run`
+- `sync_run_status`
+- `record_step_artifact`

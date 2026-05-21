@@ -6,6 +6,10 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from testflow_ai.core.artifacts import ensure_run_layout, write_manifest
+from testflow_ai.core.models import RunStatus
+from testflow_ai.core.paths import artifact_base, db_path
+from testflow_ai.core.registry import Registry
 from testflow_ai.toolkits import sessions
 
 
@@ -223,6 +227,168 @@ def block_step(session_id: str, step_id: str, reason: str) -> dict[str, Any]:
     return complete_step(session_id, step_id, summary=reason, status="blocked")
 
 
+def create_linked_run(
+    session_id: str,
+    step_id: str,
+    executor_type: str,
+    dataset_version_id: str = "",
+    config_json: str = "",
+    config: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Create a TestFlow run and link it to a workflow step."""
+    workflow = _load_workflow(session_id)
+    if "error" in workflow:
+        return workflow
+    if _find_step(workflow, step_id) is None:
+        return {"success": False, "error": "step not found", "step_id": step_id}
+
+    executor_config = _load_config(config_json, config)
+    workflow_ref = {"session_id": session_id, "step_id": step_id}
+    reg = Registry(db_path())
+    rec = reg.create_run(
+        executor_type=executor_type,
+        dataset_version_id=dataset_version_id or None,
+        artifact_root="",
+        manifest={
+            "executor_type": executor_type,
+            "dataset_version_id": dataset_version_id or None,
+            "executor_config": executor_config,
+            "workflow": workflow_ref,
+        },
+    )
+    root = ensure_run_layout(artifact_base(), rec.id)
+    reg.update_artifact_root(rec.id, str(root))
+    manifest = {
+        **rec.manifest,
+        "run_id": rec.id,
+        "artifact_uri": str(root),
+        "workflow": workflow_ref,
+    }
+    reg.update_manifest(rec.id, manifest)
+    write_manifest(
+        root,
+        {
+            "run_id": rec.id,
+            "executor_type": executor_type,
+            "dataset_version_id": dataset_version_id or None,
+            "executor_config": _safe_manifest_config(executor_config),
+            "workflow": workflow_ref,
+            "trace_backend": None,
+        },
+    )
+    linked = link_run(
+        session_id=session_id,
+        step_id=step_id,
+        run_id=rec.id,
+        executor_type=executor_type,
+        artifact_root=str(root),
+        status=rec.status.value,
+        summary="created linked run",
+    )
+    return {
+        "success": linked.get("success", False),
+        "session_id": session_id,
+        "step_id": step_id,
+        "run_id": rec.id,
+        "artifact_root": str(root),
+        "workflow_status": linked.get("workflow_status"),
+    }
+
+
+def link_run(
+    session_id: str,
+    step_id: str,
+    run_id: str,
+    executor_type: str = "",
+    artifact_root: str = "",
+    status: str = "",
+    summary: str | dict[str, Any] = "",
+) -> dict[str, Any]:
+    """Link an existing TestFlow run to a workflow step."""
+    root = sessions.session_dir(session_id)
+    workflow = _load_workflow(session_id)
+    if "error" in workflow:
+        return workflow
+    step = _find_step(workflow, step_id)
+    if step is None:
+        return {"success": False, "error": "step not found", "step_id": step_id}
+
+    run_link = {
+        "run_id": run_id,
+        "executor_type": executor_type,
+        "artifact_root": artifact_root,
+        "status": status,
+        "summary": summary,
+        "linked_at": _now(),
+    }
+    _upsert_item(step.setdefault("runs", []), "run_id", run_link)
+    if step.get("status") == "pending":
+        step["status"] = "in_progress"
+        step["started_at"] = step.get("started_at") or _now()
+    workflow["updated_at"] = _now()
+    workflow["history"].append({"event": "run_linked", "step_id": step_id, "run_id": run_id, "at": _now()})
+    _refresh_workflow_status(workflow)
+    _write_workflow(root, workflow)
+    return {"success": True, "session_id": session_id, "step": step, "workflow_status": workflow["status"]}
+
+
+def sync_run_status(
+    session_id: str,
+    step_id: str,
+    run_id: str,
+    complete_on_terminal: bool = True,
+) -> dict[str, Any]:
+    """Sync a linked run status from the ledger back to a workflow step."""
+    rec = Registry(db_path()).get_run(run_id)
+    if rec is None:
+        return {"success": False, "error": "run not found", "run_id": run_id}
+
+    summary_payload = _read_json(Path(rec.artifact_root) / "summary.json")
+    summary_text = _run_summary_text(rec.status, summary_payload)
+    linked = link_run(
+        session_id=session_id,
+        step_id=step_id,
+        run_id=run_id,
+        executor_type=rec.executor_type,
+        artifact_root=rec.artifact_root,
+        status=rec.status.value,
+        summary=summary_payload or summary_text,
+    )
+    if not linked.get("success"):
+        return linked
+
+    if complete_on_terminal and rec.status == RunStatus.succeeded:
+        return complete_step(session_id, step_id, summary=summary_text, status="completed")
+    if complete_on_terminal and rec.status == RunStatus.failed:
+        return complete_step(session_id, step_id, summary=summary_text, status="blocked")
+    return {"success": True, "session_id": session_id, "step": linked["step"], "workflow_status": linked["workflow_status"]}
+
+
+def record_step_artifact(
+    session_id: str,
+    step_id: str,
+    name: str,
+    path: str,
+    kind: str = "artifact",
+    summary: str = "",
+) -> dict[str, Any]:
+    """Record an artifact produced by a workflow step."""
+    root = sessions.session_dir(session_id)
+    workflow = _load_workflow(session_id)
+    if "error" in workflow:
+        return workflow
+    step = _find_step(workflow, step_id)
+    if step is None:
+        return {"success": False, "error": "step not found", "step_id": step_id}
+
+    artifact = {"name": name, "path": path, "kind": kind, "summary": summary, "recorded_at": _now()}
+    _upsert_item(step.setdefault("artifacts", []), "name", artifact)
+    workflow["updated_at"] = _now()
+    workflow["history"].append({"event": "artifact_recorded", "step_id": step_id, "name": name, "at": _now()})
+    _write_workflow(root, workflow)
+    return {"success": True, "session_id": session_id, "step": step}
+
+
 def _build_step(step: dict[str, str | None], routes: set[str]) -> dict[str, Any]:
     route = step.get("route")
     return {
@@ -259,6 +425,51 @@ def _load_workflow(session_id: str) -> dict[str, Any]:
         return json.loads(path.read_text(encoding="utf-8"))
     except json.JSONDecodeError:
         return {"success": False, "error": "workflow file is not valid JSON", "path": str(path)}
+
+
+def _load_config(config_json: str, config: dict[str, Any] | None) -> dict[str, Any]:
+    if config is not None:
+        return dict(config)
+    if not config_json:
+        return {}
+    loaded = json.loads(config_json)
+    if not isinstance(loaded, dict):
+        raise ValueError("config_json must be a JSON object")
+    return loaded
+
+
+def _safe_manifest_config(config: dict[str, Any]) -> dict[str, Any]:
+    blocked = {"api_key", "token", "password", "secret"}
+    return {
+        key: ("***" if any(part in key.lower() for part in blocked) else value)
+        for key, value in config.items()
+    }
+
+
+def _read_json(path: Path) -> dict[str, Any]:
+    if not path.exists():
+        return {}
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return {}
+    return data if isinstance(data, dict) else {}
+
+
+def _run_summary_text(status: RunStatus, summary: dict[str, Any]) -> str:
+    passed = summary.get("passed")
+    failed = summary.get("failed")
+    if passed is not None or failed is not None:
+        return f"run {status.value}: passed={passed or 0}, failed={failed or 0}"
+    return f"run {status.value}"
+
+
+def _upsert_item(items: list[dict[str, Any]], key: str, new_item: dict[str, Any]) -> None:
+    for index, item in enumerate(items):
+        if item.get(key) == new_item.get(key):
+            items[index] = {**item, **new_item}
+            return
+    items.append(new_item)
 
 
 def _write_workflow(root: Path, workflow: dict[str, Any]) -> None:

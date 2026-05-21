@@ -130,6 +130,30 @@ BUILTIN_TOOLS: tuple[ToolSpec, ...] = (
         summary="Complete, skip, or block one workflow step.",
         handler=workflows.complete_step,
     ),
+    ToolSpec(
+        name="create_linked_run",
+        domain="workflow",
+        summary="Create a TestFlow run and link it to a workflow step.",
+        handler=workflows.create_linked_run,
+    ),
+    ToolSpec(
+        name="link_run",
+        domain="workflow",
+        summary="Link an existing TestFlow run to a workflow step.",
+        handler=workflows.link_run,
+    ),
+    ToolSpec(
+        name="sync_run_status",
+        domain="workflow",
+        summary="Sync a linked run status from the ledger to a workflow step.",
+        handler=workflows.sync_run_status,
+    ),
+    ToolSpec(
+        name="record_step_artifact",
+        domain="workflow",
+        summary="Record an artifact produced by a workflow step.",
+        handler=workflows.record_step_artifact,
+    ),
 )
 
 

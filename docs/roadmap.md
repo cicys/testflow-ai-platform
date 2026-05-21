@@ -18,6 +18,7 @@
 - 用例批次合并与校验工具。
 - 用例执行注册表与进度跟踪。
 - 本地 workflow 编排，用于规划、执行与报告状态推进。
+- Workflow 步骤与 run ledger 关联，用于把计划、执行和产物追踪串联起来。
 - API 套件运行器与 HTTP 执行适配。
 - UI 套件 schema 与 Playwright spec 编译。
 - Agent Gateway 执行器（对话式自动化服务）。

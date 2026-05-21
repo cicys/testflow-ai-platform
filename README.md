@@ -14,6 +14,7 @@ TestFlow AI Platform 是一套轻量级的运行台账（run ledger）与执行�
 - 对比运行摘要与样本级预测（predictions）。
 - 通过会话、用例批次、覆盖校验与执行进度，管理偏「技能化」的测试工作流。
 - 使用 `workflow.json` 跟踪从需求分析到执行、报告、发布检查的项目流程。
+- 将 workflow 步骤与 run ledger 关联，支持执行后自动同步步骤状态。
 - 通过 JSONL stdio **Tool Server** 将 toolkit 能力暴露给本地 agent 或脚本。
 - 从运行或工具集会话生成 **Markdown 报告**。
 - 通过 **`toolkit caseops`** 构造或提交通用 CaseOps 载荷（端点由环境变量配置）。
@@ -83,6 +84,7 @@ testflow toolkit case progress <session_id>
 testflow toolkit workflow start demo-project --routes api,ui
 testflow toolkit workflow next <session_id>
 testflow toolkit workflow complete <session_id> requirement_analysis --summary "Scope captured"
+testflow toolkit workflow create-run <session_id> api_suite_execution --executor mock
 
 testflow report run "$RUN_A"
 testflow report session <session_id>
@@ -139,6 +141,9 @@ testflow toolkit workflow start demo-project --routes api,ui
 testflow toolkit workflow status <session_id>
 testflow toolkit workflow next <session_id>
 testflow toolkit workflow complete <session_id> <step_id> --summary "Done"
+testflow toolkit workflow create-run <session_id> <step_id> --executor mock
+testflow toolkit workflow sync-run <session_id> <step_id> <run_id>
+testflow toolkit workflow record-artifact <session_id> <step_id> suite suite.json --kind suite
 testflow toolkit caseops payload --owner tester --project-id sprint-1 --description "smoke ok" --status passed
 ```
 

@@ -33,7 +33,9 @@ testflow run diff "$RUN" "$RUN"
 testflow api validate-suite examples/api_suites/http-smoke.json
 testflow ui validate-suite examples/ui_suites/browser-smoke.json
 testflow report run "$RUN"
-testflow toolkit workflow start release-check --routes api,ui
+WORKFLOW_JSON=$(testflow toolkit workflow start release-check --routes api,ui)
+SESSION_ID=$(printf '%s' "$WORKFLOW_JSON" | python3 -c 'import json,sys; print(json.load(sys.stdin)["session"]["session_id"])')
+testflow toolkit workflow create-run "$SESSION_ID" api_suite_execution --executor mock
 printf '%s\n' '{"id":1,"method":"server.info"}' '{"id":2,"method":"server.shutdown"}' | testflow server stdio
 ```
 
